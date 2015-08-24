@@ -175,6 +175,8 @@ void * allocateObject( size_t size )
 
   o->_objectSize = roundedSize;
 
+  pthread_mutex_unlock(&mutex);
+
   // Return a pointer to usable memory
   return (void *) (o + 1);
 
