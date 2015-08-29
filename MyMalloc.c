@@ -188,9 +188,6 @@ void * allocateObject( size_t size )
 	ptr -> _next -> _prev = ptr;
 	ptr -> _prev -> _next = ptr;
 	
-		
-	
-	
 	// Naively get memory from the OS every time
 	//void * _mem = getMemoryFromOS( roundedSize );
 
