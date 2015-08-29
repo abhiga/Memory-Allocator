@@ -167,18 +167,32 @@ void * allocateObject( size_t size )
 	// 8 bytes for alignment.
 	
 	size_t roundedSize = (size + sizeof(struct ObjectHeader) + sizeof(struct ObjectFooter) + 7) & ~7;
-	
-	/*struct ObjectHeader * ptr = _freeList->_next;
+
+	int count = 0; //check whether objectheader pointed by freelist is 1st element
+	struct ObjectHeader * ptr = _freeList->_next;
 	while(ptr != _freeList){
+		count++;
 		if (ptr -> _objectSize >= roundedSize)
 			break;
 	}
-	_mem = ptr;
-	ptr = ptr + roundedSize;*/
+	size_t tobjectSize = ptr -> _objectSize;
+	struct ObjectHeader * tnext = ptr -> _next;
+	struct ObjectHeader * tprev = ptr -> _prev; 
+	
+	void * _mem = ptr;
+	ptr = (struct ObjectHeader *)((char*)ptr + roundedSize);
+	ptr -> _allocated = 0;
+	ptr -> _objectSize = tobjectSize - roundedSize;
+	ptr -> _next = tnext;
+	ptr -> _prev = tprev;
+	ptr -> _next -> _prev = ptr;
+	ptr -> _prev -> _next = ptr;
+	
+		
 	
 	
 	// Naively get memory from the OS every time
-	void * _mem = getMemoryFromOS( roundedSize );
+	//void * _mem = getMemoryFromOS( roundedSize );
 
 	// Store the size in the header
 	struct ObjectHeader * o = (struct ObjectHeader *) _mem;
