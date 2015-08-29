@@ -168,18 +168,19 @@ void * allocateObject( size_t size )
 	
 	size_t roundedSize = (size + sizeof(struct ObjectHeader) + sizeof(struct ObjectFooter) + 7) & ~7;
 
-	int count = 0; //check whether objectheader pointed by freelist is 1st element
+	// creating a temporary pointer and checking through the free list whether this new malloc memory request is satisfied by free memory list
 	struct ObjectHeader * ptr = _freeList->_next;
 	while(ptr != _freeList){
-		count++;
 		if (ptr -> _objectSize >= roundedSize)
 			break;
 	}
+	// storing the values of soon to be modified memory chunk into temporary memory
 	size_t tobjectSize = ptr -> _objectSize;
 	struct ObjectHeader * tnext = ptr -> _next;
 	struct ObjectHeader * tprev = ptr -> _prev; 
 	
 	void * _mem = ptr;
+	// shifting current pointer by roundedSize
 	ptr = (struct ObjectHeader *)((char*)ptr + roundedSize);
 	ptr -> _allocated = 0;
 	ptr -> _objectSize = tobjectSize - roundedSize;
@@ -187,6 +188,10 @@ void * allocateObject( size_t size )
 	ptr -> _prev = tprev;
 	ptr -> _next -> _prev = ptr;
 	ptr -> _prev -> _next = ptr;
+	
+	struct ObjectFooter * foot = (struct ObjectFooter *) ((char *) ptr + ptr -> _objectSize - sizeof(struct ObjectFooter));
+	foot->_objectSize = ptr -> _objectSize;
+	foot->_allocated = 0;
 	
 	// Naively get memory from the OS every time
 	//void * _mem = getMemoryFromOS( roundedSize );
