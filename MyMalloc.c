@@ -173,6 +173,7 @@ void * allocateObject( size_t size )
 	while(ptr != _freeList){
 		if (ptr -> _objectSize >= roundedSize)
 			break;
+		ptr = ptr -> _next;
 	}
 	// storing the values of soon to be modified memory chunk into temporary memory
 	size_t tobjectSize = ptr -> _objectSize;
@@ -216,6 +217,15 @@ void * allocateObject( size_t size )
 void freeObject( void * ptr )
 {
 	// Add your code here
+	struct ObjectHeader * hdr = (struct ObjectHeader*) ((char *)ptr - sizeof(struct ObjectHeader));
+	struct ObjectFooter * ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
+	hdr -> _allocated = 0;
+	ftr -> _allocated = 0;
+	/*struct ObjectHeader * ptr = _freeList->_next;
+	while(ptr <= hdr){
+		ptr = ptr -> _next;
+	}*/
+	struct ObjectHeader *temp = hdr;
 
 	return;
 
