@@ -228,7 +228,7 @@ void freeObject( void * ptr )
 	struct ObjectHeader * nexthdr = (struct ObjectHeader*) ((char*)ftr + sizeof(struct ObjectFooter));
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
-	if (prevftr > _memStart) {
+	if (prevftr >= _memStart) {
 		if(prevftr -> _allocated == 0) {
 			temphdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter)); 
 			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize;
