@@ -178,8 +178,18 @@ void * allocateObject( size_t size )
 		ptr = ptr -> _next;
 	}
 	if (check) {
-		initialize();
-		ptr = _freeList -> _next;
+		void * temp = getMemoryFromOS( ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter)) );
+		struct ObjectHeader * hdr = (struct ObjectHeader *) temp;
+		hdr -> _allocated = 0;
+		hdr -> _objectSize = ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter));
+		hdr -> _next = _freeList;
+		hdr -> _prev = _freeList -> _prev;
+		_freeList -> _prev -> _next = hdr;
+		_freeList -> _prev = hdr;
+		struct ObjectHeader * ftr = (struct ObjectFooter *) ((char *)temp + ArenaSize + (sizeof(struct ObjectHeader)));
+		ftr -> _allocated = 0;
+		ftr -> _objectSize = hdr -> _objectSize;
+		
 	}
 	// storing the values of soon to be modified memory chunk into temporary memory
 	size_t tobjectSize = ptr -> _objectSize;
