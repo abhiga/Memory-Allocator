@@ -165,7 +165,7 @@ void * allocateObject( size_t size )
 
 	// Add the ObjectHeader/Footer to the size and round the total size up to a multiple of
 	// 8 bytes for alignment.
-	
+
 	size_t roundedSize = (size + sizeof(struct ObjectHeader) + sizeof(struct ObjectFooter) + 7) & ~7;
 
 	// creating a temporary pointer and checking through the free list whether this new malloc memory request is satisfied by free memory list
@@ -179,55 +179,55 @@ void * allocateObject( size_t size )
 	size_t tobjectSize = ptr -> _objectSize;
 	struct ObjectHeader * tnext = ptr -> _next;
 	struct ObjectHeader * tprev = ptr -> _prev; 
-	
+
 	void * _mem = ptr;
 	// shifting current pointer by roundedSize
 	if (tobjectSize - roundedSize < 56) {
 		ptr -> _prev -> _next = ptr -> _next;
 		ptr -> _next -> _prev = ptr -> _prev;
 		// Store the size in the header
-	struct ObjectHeader * o = (struct ObjectHeader *) _mem;
-	o->_allocated = 1;
-	
-	struct ObjectFooter * p = (struct ObjectFooter *) ((char *) o + tobjectSize - sizeof(struct ObjectFooter));
-	p->_objectSize = roundedSize;
-	p->_allocated = 1;
+		struct ObjectHeader * o = (struct ObjectHeader *) _mem;
+		o->_allocated = 1;
 
-	pthread_mutex_unlock(&mutex);
+		struct ObjectFooter * p = (struct ObjectFooter *) ((char *) o + tobjectSize - sizeof(struct ObjectFooter));
+		p->_objectSize = roundedSize;
+		p->_allocated = 1;
 
-	// Return a pointer to usable memory
-	return (void *) (o + 1);
+		pthread_mutex_unlock(&mutex);
+
+		// Return a pointer to usable memory
+		return (void *) (o + 1);
 	}
 	else {	
-	ptr = (struct ObjectHeader *)((char*)ptr + roundedSize);
-	ptr -> _allocated = 0;
-	ptr -> _objectSize = tobjectSize - roundedSize;
-	ptr -> _next = tnext;
-	ptr -> _prev = tprev;
-	ptr -> _next -> _prev = ptr;
-	ptr -> _prev -> _next = ptr;
-	
-	struct ObjectFooter * foot = (struct ObjectFooter *) ((char *) ptr + ptr -> _objectSize - sizeof(struct ObjectFooter));
-	foot->_objectSize = ptr -> _objectSize;
-	foot->_allocated = 0;
-	
-	// Naively get memory from the OS every time
-	//void * _mem = getMemoryFromOS( roundedSize );
+		ptr = (struct ObjectHeader *)((char*)ptr + roundedSize);
+		ptr -> _allocated = 0;
+		ptr -> _objectSize = tobjectSize - roundedSize;
+		ptr -> _next = tnext;
+		ptr -> _prev = tprev;
+		ptr -> _next -> _prev = ptr;
+		ptr -> _prev -> _next = ptr;
 
-	// Store the size in the header
-	struct ObjectHeader * o = (struct ObjectHeader *) _mem;
+		struct ObjectFooter * foot = (struct ObjectFooter *) ((char *) ptr + ptr -> _objectSize - sizeof(struct ObjectFooter));
+		foot->_objectSize = ptr -> _objectSize;
+		foot->_allocated = 0;
 
-	o->_objectSize = roundedSize;
-	o->_allocated = 1;
-	
-	struct ObjectFooter * p = (struct ObjectFooter *) ((char *) o + roundedSize - sizeof(struct ObjectFooter));
-	p->_objectSize = roundedSize;
-	p->_allocated = 1;
+		// Naively get memory from the OS every time
+		//void * _mem = getMemoryFromOS( roundedSize );
 
-	pthread_mutex_unlock(&mutex);
+		// Store the size in the header
+		struct ObjectHeader * o = (struct ObjectHeader *) _mem;
 
-	// Return a pointer to usable memory
-	return (void *) (o + 1);
+		o->_objectSize = roundedSize;
+		o->_allocated = 1;
+
+		struct ObjectFooter * p = (struct ObjectFooter *) ((char *) o + roundedSize - sizeof(struct ObjectFooter));
+		p->_objectSize = roundedSize;
+		p->_allocated = 1;
+
+		pthread_mutex_unlock(&mutex);
+
+		// Return a pointer to usable memory
+		return (void *) (o + 1);
 	}
 
 }
@@ -240,9 +240,9 @@ void freeObject( void * ptr )
 	hdr -> _allocated = 0;
 	ftr -> _allocated = 0;
 	/*struct ObjectHeader * ptr = _freeList->_next;
-	while(ptr <= hdr){
-		ptr = ptr -> _next;
-	}*/
+	  while(ptr <= hdr){
+	  ptr = ptr -> _next;
+	  }*/
 	struct ObjectHeader * nexthdr = (struct ObjectHeader*) ((char*)ftr + sizeof(struct ObjectFooter));
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
@@ -263,18 +263,18 @@ void freeObject( void * ptr )
 		}
 		else {
 			struct ObjectHeader * temp = _freeList->_next;
-				while (temp != _freeList) {
-					if (temp <= ftr && ftr <= temp -> _next)
-						break;
-					temp = temp -> _next;
-				}
+			while (temp != _freeList) {
+				if (temp <= ftr && ftr <= temp -> _next)
+					break;
+				temp = temp -> _next;
+			}
 			hdr -> _next = temp -> _next;
 			hdr -> _prev = temp;
 			hdr -> _next -> _prev = hdr;
 			hdr -> _prev -> _next = hdr;
 		}
 	}	
-		
+
 	return;
 
 }
