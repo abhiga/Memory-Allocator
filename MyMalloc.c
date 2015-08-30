@@ -283,15 +283,15 @@ void freeObject( void * ptr )
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
 	if (hdr >= _memStart) {
-		if (nexthdr -> _allocated == 0 && prevftr -> _allocated == 0) {
+		/*if (nexthdr -> _allocated == 0 && prevftr -> _allocated == 0) {
 			struct ObjectHeader *prevhdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter));
 			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize + nexthdr -> _objectSize;
 			prevhdr -> _objectSize = prevftr -> _objectSize;
 			prevhdr -> _next = nexthdr -> _next;
 			prevhdr -> _next -> _prev = prevhdr;
 			
-		}
-		else if (nexthdr -> _allocated == 0) {
+		}*/
+		if (nexthdr -> _allocated == 0) {
 			hdr -> _objectSize = hdr -> _objectSize + nexthdr -> _objectSize;
 			hdr -> _next = nexthdr -> _next;
 			hdr -> _prev = nexthdr -> _prev;
