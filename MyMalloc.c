@@ -182,6 +182,23 @@ void * allocateObject( size_t size )
 	
 	void * _mem = ptr;
 	// shifting current pointer by roundedSize
+	if (tobjectSize - roundedSize < 56) {
+		ptr -> _prev -> _next = ptr -> _next;
+		ptr -> _next -> _prev = ptr -> _prev;
+		// Store the size in the header
+	struct ObjectHeader * o = (struct ObjectHeader *) _mem;
+	o->_allocated = 1;
+	
+	struct ObjectFooter * p = (struct ObjectFooter *) ((char *) o + tobjectSize - sizeof(struct ObjectFooter));
+	p->_objectSize = roundedSize;
+	p->_allocated = 1;
+
+	pthread_mutex_unlock(&mutex);
+
+	// Return a pointer to usable memory
+	return (void *) (o + 1);
+	}
+	else {	
 	ptr = (struct ObjectHeader *)((char*)ptr + roundedSize);
 	ptr -> _allocated = 0;
 	ptr -> _objectSize = tobjectSize - roundedSize;
@@ -211,6 +228,7 @@ void * allocateObject( size_t size )
 
 	// Return a pointer to usable memory
 	return (void *) (o + 1);
+	}
 
 }
 
