@@ -279,6 +279,7 @@ void freeObject( void * ptr )
 	  while(ptr <= hdr){
 	  ptr = ptr -> _next;
 	  }*/
+	int check = 0;
 	struct ObjectHeader * nexthdr = (struct ObjectHeader*) ((char*)ftr + sizeof(struct ObjectFooter));
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
@@ -299,11 +300,16 @@ void freeObject( void * ptr )
 			hdr -> _prev -> _next = hdr;
 			ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
 			ftr -> _objectSize = hdr -> _objectSize;
+			check = 1;
 		}
 		else if(prevftr -> _allocated == 0) {
 			temphdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter)); 
 			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize;
 			temphdr -> _objectSize = prevftr -> _objectSize;
+			/*if(check) {
+				temphdr -> _next = temphdr -> _next -> _next;
+				temphdr -> _next -> _prev = temphdr;			
+			}*/
 		}
 		else {
 			struct ObjectHeader * temp = _freeList->_next;
