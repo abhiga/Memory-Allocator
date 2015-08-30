@@ -218,7 +218,7 @@ void * allocateObject( size_t size )
 
 	void * _mem = ptr;
 	// shifting current pointer by roundedSize
-	if (tobjectSize - roundedSize < 56) {
+	if (tobjectSize - roundedSize <= 56) {
 		ptr -> _prev -> _next = ptr -> _next;
 		ptr -> _next -> _prev = ptr -> _prev;
 		// Store the size in the header
