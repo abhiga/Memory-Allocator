@@ -279,20 +279,21 @@ void freeObject( void * ptr )
 	  while(ptr <= hdr){
 	  ptr = ptr -> _next;
 	  }*/
-	int check = 0;
+	//int check = 0;
 	struct ObjectHeader * nexthdr = (struct ObjectHeader*) ((char*)ftr + sizeof(struct ObjectFooter));
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
 	if (hdr >= _memStart) {
-		/*if (nexthdr -> _allocated == 0 && prevftr -> _allocated == 0) {
+		if (nexthdr -> _allocated == 0 && prevftr -> _allocated == 0) {
 			struct ObjectHeader *prevhdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter));
-			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize + nexthdr -> _objectSize;
-			prevhdr -> _objectSize = prevftr -> _objectSize;
+			struct ObjectHeader *nextftr = (struct ObjectFooter *) ((char*) nexthdr + nexthdr -> _objectSize - sizeof(struct ObjectFooter));
+			nextftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize + nexthdr -> _objectSize;
+			prevhdr -> _objectSize = nextftr -> _objectSize;
 			prevhdr -> _next = nexthdr -> _next;
 			prevhdr -> _next -> _prev = prevhdr;
 			
-		}*/
-		if (nexthdr -> _allocated == 0) {
+		}
+		else if (nexthdr -> _allocated == 0) {
 			hdr -> _objectSize = hdr -> _objectSize + nexthdr -> _objectSize;
 			hdr -> _next = nexthdr -> _next;
 			hdr -> _prev = nexthdr -> _prev;
@@ -300,7 +301,7 @@ void freeObject( void * ptr )
 			hdr -> _prev -> _next = hdr;
 			ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
 			ftr -> _objectSize = hdr -> _objectSize;
-			check = 1;
+			//check = 1;
 		}
 		else if(prevftr -> _allocated == 0) {
 			temphdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter)); 
