@@ -235,7 +235,13 @@ void freeObject( void * ptr )
 			temphdr -> _objectSize = prevftr -> _objectSize;
 		}
 		else if (nexthdr -> _allocated == 0) {
-			
+			hdr -> _objectSize = hdr -> _objectSize + nexthdr -> _objectSize;
+			hdr -> _next = nexthdr -> _next;
+			hdr -> _prev = nexthdr -> _prev;
+			hdr -> _next -> _prev = hdr;
+			hdr -> _prev -> _next = hdr;
+			ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
+			ftr -> _objectSize = hdr -> _objectSize;
 		}
 	}	
 		
