@@ -171,13 +171,12 @@ void * allocateObject( size_t size )
 	// creating a temporary pointer and checking through the free list whether this new malloc memory request is satisfied by free memory list
 	struct ObjectHeader * ptr = _freeList->_next;
 	while(ptr != _freeList){
-		if (ptr -> _objectSize >= roundedSize) {
-			check = 0;			
+		if (ptr -> _objectSize >= roundedSize) {			
 			break;
 		}
 		ptr = ptr -> _next;
-	}
-	if (check) {
+	}	
+	if (ptr == _freeList) {
 		void * temp = getMemoryFromOS( ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter)) );
 		struct ObjectHeader * hdr = (struct ObjectHeader *) temp;
 		hdr -> _allocated = 0;
