@@ -243,6 +243,18 @@ void freeObject( void * ptr )
 			ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
 			ftr -> _objectSize = hdr -> _objectSize;
 		}
+		else {
+			struct ObjectHeader * temp = _freeList->_next;
+				while (temp != _freeList) {
+					if (temp <= ftr && ftr <= temp -> _next)
+						break;
+					temp = temp -> _next;
+				}
+			hdr -> _next = temp -> _next;
+			hdr -> _prev = temp;
+			hdr -> _next -> _prev = hdr;
+			hdr -> _prev -> _next = hdr;
+		}
 	}	
 		
 	return;
