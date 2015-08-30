@@ -282,13 +282,8 @@ void freeObject( void * ptr )
 	struct ObjectHeader * nexthdr = (struct ObjectHeader*) ((char*)ftr + sizeof(struct ObjectFooter));
 	struct ObjectHeader *temphdr = NULL;
 	struct ObjectFooter *prevftr = (struct ObjectFooter*) ((char *) ftr - ftr->_objectSize);
-	if (1) {
-		if(prevftr -> _allocated == 0) {
-			temphdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter)); 
-			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize;
-			temphdr -> _objectSize = prevftr -> _objectSize;
-		}
-		else if (nexthdr -> _allocated == 0) {
+	if (hdr >= _memStart) {
+		if (nexthdr -> _allocated == 0) {
 			hdr -> _objectSize = hdr -> _objectSize + nexthdr -> _objectSize;
 			hdr -> _next = nexthdr -> _next;
 			hdr -> _prev = nexthdr -> _prev;
@@ -296,6 +291,11 @@ void freeObject( void * ptr )
 			hdr -> _prev -> _next = hdr;
 			ftr = (struct ObjectFooter*) ((char *)hdr + hdr->_objectSize - sizeof(struct ObjectFooter));
 			ftr -> _objectSize = hdr -> _objectSize;
+		}
+		else if(prevftr -> _allocated == 0) {
+			temphdr = (struct ObjectHeader *) ((char*) prevftr - prevftr-> _objectSize + sizeof(struct ObjectFooter)); 
+			prevftr -> _objectSize = prevftr -> _objectSize + ftr -> _objectSize;
+			temphdr -> _objectSize = prevftr -> _objectSize;
 		}
 		else {
 			struct ObjectHeader * temp = _freeList->_next;
