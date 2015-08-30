@@ -208,6 +208,7 @@ void * allocateObject( size_t size )
 		struct ObjectHeader * ftr = (struct ObjectFooter *) ((char *)temp + ArenaSize + (sizeof(struct ObjectHeader)));
 		ftr -> _allocated = 0;
 		ftr -> _objectSize = hdr -> _objectSize;
+		ptr = hdr;
 
 	}
 	// storing the values of soon to be modified memory chunk into temporary memory
