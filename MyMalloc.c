@@ -167,7 +167,6 @@ void * allocateObject( size_t size )
 	// 8 bytes for alignment.
 
 	size_t roundedSize = (size + sizeof(struct ObjectHeader) + sizeof(struct ObjectFooter) + 7) & ~7;
-	int check = 1;
 	// creating a temporary pointer and checking through the free list whether this new malloc memory request is satisfied by free memory list
 	struct ObjectHeader * ptr = _freeList->_next;
 	while(ptr != _freeList){
