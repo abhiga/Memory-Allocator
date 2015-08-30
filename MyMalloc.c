@@ -170,43 +170,45 @@ void * allocateObject( size_t size )
 	// creating a temporary pointer and checking through the free list whether this new malloc memory request is satisfied by free memory list
 	struct ObjectHeader * ptr = _freeList->_next;
 	while(ptr != _freeList){
+		printf("abhiga\n");
 		if (ptr -> _objectSize >= roundedSize) {			
 			break;
 		}
 		ptr = ptr -> _next;
 	}	
 	if (ptr == _freeList) {
+		printf("abhiga1\n");
 		void * _mem = getMemoryFromOS( ArenaSize + (2*sizeof(struct ObjectHeader)) + (2*sizeof(struct ObjectFooter)) );
 
-	struct ObjectFooter * fencepost1 = (struct ObjectFooter *)_mem;
-	fencepost1->_allocated = 1;
-	fencepost1->_objectSize = 123456789;
-	char * temp = 
-		(char *)_mem + (2*sizeof(struct ObjectFooter)) + sizeof(struct ObjectHeader) + ArenaSize;
-	struct ObjectHeader * fencepost2 = (struct ObjectHeader *)temp;
-	fencepost2->_allocated = 1;
-	fencepost2->_objectSize = 123456789;
-	fencepost2->_next = NULL;
-	fencepost2->_prev = NULL;
+		struct ObjectFooter * fencepost1 = (struct ObjectFooter *)_mem;
+		fencepost1->_allocated = 1;
+		fencepost1->_objectSize = 123456789;
+		char * temp = 
+			(char *)_mem + (2*sizeof(struct ObjectFooter)) + sizeof(struct ObjectHeader) + ArenaSize;
+		struct ObjectHeader * fencepost2 = (struct ObjectHeader *)temp;
+		fencepost2->_allocated = 1;
+		fencepost2->_objectSize = 123456789;
+		fencepost2->_next = NULL;
+		fencepost2->_prev = NULL;
 
-	//initialize the list to point to the _mem
-	temp = (char *) _mem + sizeof(struct ObjectFooter);
-	/*struct ObjectHeader * currentHeader = (struct ObjectHeader *) temp;
-	temp = (char *)_mem + sizeof(struct ObjectFooter) + sizeof(struct ObjectHeader) + ArenaSize;
-	struct ObjectFooter * currentFooter = (struct ObjectFooter *) temp;*/
+		//initialize the list to point to the _mem
+		temp = (char *) _mem + sizeof(struct ObjectFooter);
+		/*struct ObjectHeader * currentHeader = (struct ObjectHeader *) temp;
+		  temp = (char *)_mem + sizeof(struct ObjectFooter) + sizeof(struct ObjectHeader) + ArenaSize;
+		  struct ObjectFooter * currentFooter = (struct ObjectFooter *) temp;*/
 
 
 		struct ObjectHeader * hdr = (struct ObjectHeader *) temp;
 		hdr -> _allocated = 0;
 		hdr -> _objectSize = ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter));
-		hdr -> _next = _freeList;
-		hdr -> _prev = _freeList -> _prev;
-		_freeList -> _prev -> _next = hdr;
-		_freeList -> _prev = hdr;
+		hdr -> _next = ptr;
+		hdr -> _prev = ptr -> _prev;
+		ptr -> _prev -> _next = hdr;
+		ptr -> _prev = hdr;
 		struct ObjectHeader * ftr = (struct ObjectFooter *) ((char *)temp + ArenaSize + (sizeof(struct ObjectHeader)));
 		ftr -> _allocated = 0;
 		ftr -> _objectSize = hdr -> _objectSize;
-		
+
 	}
 	// storing the values of soon to be modified memory chunk into temporary memory
 	size_t tobjectSize = ptr -> _objectSize;
