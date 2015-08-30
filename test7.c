@@ -24,12 +24,12 @@ main( int argc, char **argv )
     free(ptrs[i]);
   }
   print_list();
-  /*printf("------------ Free odd ----------------\n");
+  printf("------------ Free odd ----------------\n");
   for(i = 1; i<allocations; i = i+2){
     free(ptrs[i]);
   }
   print_list();
-*/
+
   printf("---- Allocate 100 blocks ----\n");
   for (i = 0; i < allocations; i++ ) {
     char * p1 = (char *) malloc(100 );
