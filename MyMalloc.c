@@ -176,7 +176,26 @@ void * allocateObject( size_t size )
 		ptr = ptr -> _next;
 	}	
 	if (ptr == _freeList) {
-		void * temp = getMemoryFromOS( ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter)) );
+		void * _mem = getMemoryFromOS( ArenaSize + (2*sizeof(struct ObjectHeader)) + (2*sizeof(struct ObjectFooter)) );
+
+	struct ObjectFooter * fencepost1 = (struct ObjectFooter *)_mem;
+	fencepost1->_allocated = 1;
+	fencepost1->_objectSize = 123456789;
+	char * temp = 
+		(char *)_mem + (2*sizeof(struct ObjectFooter)) + sizeof(struct ObjectHeader) + ArenaSize;
+	struct ObjectHeader * fencepost2 = (struct ObjectHeader *)temp;
+	fencepost2->_allocated = 1;
+	fencepost2->_objectSize = 123456789;
+	fencepost2->_next = NULL;
+	fencepost2->_prev = NULL;
+
+	//initialize the list to point to the _mem
+	temp = (char *) _mem + sizeof(struct ObjectFooter);
+	/*struct ObjectHeader * currentHeader = (struct ObjectHeader *) temp;
+	temp = (char *)_mem + sizeof(struct ObjectFooter) + sizeof(struct ObjectHeader) + ArenaSize;
+	struct ObjectFooter * currentFooter = (struct ObjectFooter *) temp;*/
+
+
 		struct ObjectHeader * hdr = (struct ObjectHeader *) temp;
 		hdr -> _allocated = 0;
 		hdr -> _objectSize = ArenaSize + (sizeof(struct ObjectHeader)) + (sizeof(struct ObjectFooter));
